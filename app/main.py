@@ -22,7 +22,7 @@ from app.ui import (
 @st.cache_data(ttl=60)  # Данные кэшируются на 1 минуту
 def get_data_from_api():
     timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    st.write(f"[{timestamp}] Fetching data from API...")
+    st.markdown(f"<div style='color: orange; font-size: small;'>[{timestamp}] Fetching data from API...</div>", unsafe_allow_html=True)
     futures_coins = fetch_futures_coins()  # Получаем фьючерсные монеты
     data = fetch_data_from_api()  # Получаем данные из API
     rsi14_values, intervals = parse_data(data, futures_coins)  # Парсим данные
@@ -31,13 +31,13 @@ def get_data_from_api():
     df = add_rsi_zones(df)  # Добавляем зоны RSI и дивергенции
     save_data(df)  # Сохраняем измененные данные
     timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    st.write(f"[{timestamp}] Data fetched successfully.")
+    st.markdown(f"<div style='color: orange; font-size: small;'>[{timestamp}] Data fetched successfully.</div>", unsafe_allow_html=True)
     return df
 
 @st.cache_data(ttl=60)  # Данные кэшируются на 1 минуту
 def get_cached_data():
     timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    st.write(f"[{timestamp}] Fetching cached data...")
+    st.markdown(f"<div style='color: orange; font-size: small;'>[{timestamp}] Fetching cached data...</div>", unsafe_allow_html=True)
     return get_data_from_api()
 
 def main():
@@ -64,10 +64,10 @@ def main():
 
     # Ожидаем время до начала новой свечи и перезапускаем приложение
     timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    st.write(f"[{timestamp}] Ожидание {int(sleep_time)} секунд до следующего обновления...")
+    st.markdown(f"<div style='color: orange; font-size: small;'>[{timestamp}] Ожидание {int(sleep_time)} секунд до следующего обновления...</div>", unsafe_allow_html=True)
     time.sleep(sleep_time)
     timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
-    st.write(f"[{timestamp}] Перезапуск приложения...")
+    st.markdown(f"<div style='color: orange; font-size: small;'>[{timestamp}] Перезапуск приложения...</div>", unsafe_allow_html=True)
     st.rerun()
 
 if __name__ == "__main__":

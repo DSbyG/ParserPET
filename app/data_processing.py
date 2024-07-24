@@ -2,6 +2,35 @@ import os
 import pandas as pd
 import requests
 import csv
+from .telegram_notifications import send_telegram_message
+
+def coins_in_fast_bullish_divergence(df):
+    """
+    Find coins in fast bullish divergence zones.
+
+    :param df: DataFrame with data
+    :return: DataFrame with coins in fast bullish divergence zones
+    """
+    fast_bullish_df = df[df.apply(lambda row: any(0 <= row[timeframe] < 15 for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']), axis=1)]
+    if not fast_bullish_df.empty:
+        for coin in fast_bullish_df['Coin']:
+            message = f"Монета {coin} в зоне быстрого поиска бычьего дивера."
+            send_telegram_message(message)
+    return fast_bullish_df
+
+def coins_in_fast_bearish_divergence(df):
+    """
+    Find coins in fast bearish divergence zones.
+
+    :param df: DataFrame with data
+    :return: DataFrame with coins in fast bearish divergence zones
+    """
+    fast_bearish_df = df[df.apply(lambda row: any(85 < row[timeframe] <= 100 for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']), axis=1)]
+    if not fast_bearish_df.empty:
+        for coin in fast_bearish_df['Coin']:
+            message = f"Монета {coin} в зоне быстрого поиска медвежьего дивера."
+            send_telegram_message(message)
+    return fast_bearish_df
 
 def fetch_futures_coins():
     """

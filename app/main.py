@@ -3,6 +3,9 @@ import os
 import streamlit as st
 from datetime import datetime, timedelta
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Добавляем путь к директории ParserPET в системный путь Python
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))

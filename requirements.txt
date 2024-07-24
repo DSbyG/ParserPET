@@ -2,3 +2,5 @@ streamlit
 pandas
 requests
 matplotlib
+python-telegram-bot
+python-dotenv

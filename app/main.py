@@ -68,7 +68,7 @@ def main():
     time.sleep(sleep_time)
     timestamp = datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')
     st.write(f"[{timestamp}] Перезапуск приложения...")
-    st.experimental_rerun()
+    st.rerun()
 
 if __name__ == "__main__":
     main()

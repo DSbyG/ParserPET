@@ -31,7 +31,7 @@ def show_divergence_with_progress(df, divergence_type='bullish'):
             bar_color = 'red'
             coin_color = 'red'
         
-        st.markdown(f"<h3>{timeframe}</h3>", unsafe_allow_html=True)
+        st.markdown(f"<h3 style='font-size:24px;'>{timeframe}</h3>", unsafe_allow_html=True)
         st.write(f"{percentage:.2f}% в зоне {'бычьей' if divergence_type == 'bullish' else 'медвежьей'} дивергенции.")
         
         # Display progress bar with custom color

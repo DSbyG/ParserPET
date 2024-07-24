@@ -3,9 +3,6 @@ import os
 import streamlit as st
 from datetime import datetime, timedelta
 import time
-from dotenv import load_dotenv
-
-load_dotenv()
 
 # Добавляем путь к директории ParserPET в системный путь Python
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -47,10 +44,13 @@ def main():
     now = datetime.utcnow()
     next_update = (now + timedelta(minutes=5 - now.minute % 5)).replace(second=0, microsecond=0)
     sleep_time = (next_update - now).total_seconds()
-    
-    # Ожидаем время до начала новой свечи
+
+    # Показ времени до следующего обновления
+    st.write(f"Следующее обновление: {next_update.strftime('%Y-%m-%d %H:%M:%S UTC')} (через {int(sleep_time)} секунд)")
+
+    # Ожидаем время до начала новой свечи и перезапускаем приложение
     time.sleep(sleep_time)
-    st.rerun()
+    st.experimental_rerun()
 
 if __name__ == "__main__":
     main()

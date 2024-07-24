@@ -12,7 +12,7 @@ pip install -r Ваш_путь_до_папки/requirements.txt
 
 # Запуск программы
 
-streamlit run ParserPET/app/main.py
+streamlit run /Users/geraklegg/Desktop/ParserPET/ParserPET/app/main.py
 
 
 # Git 
@@ -21,11 +21,12 @@ streamlit run ParserPET/app/main.py
 
 cd /Users/geraklegg/Desktop/ParserPET/ParserPET
 git add . 
-git commit -m "Fixed issues and updated model" 
-git push origin master 
+git commit -m "апд" 
+git push -u origin main
 
 Перейдите на Streamlit Sharing.
 Найдите ваш проект в списке.
 Нажмите на проект, чтобы перейти на его страницу.
 Нажмите на кнопку "Deploy" или "Re-deploy" для применения последних изменений из вашего репозитория GitHub.
- -->
+
+-->

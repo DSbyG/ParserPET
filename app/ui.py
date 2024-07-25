@@ -22,12 +22,12 @@ def show_divergence_with_progress(df, divergence_type='bullish'):
     for timeframe in timeframes:
         if divergence_type == 'bullish':
             percentage = percentages_df[percentages_df['timeframe'] == timeframe]['bullish_divergence'].values[0]
-            divergence_coins = df[df[f'{timeframe}_divergence'] == 'Зона бычьего дивера']['Coin'].tolist()
+            divergence_coins = df[df[f'{timeframe}_divergence'] == 'Зона бычьего дивера']['Coin'].str.replace('USDT', '').tolist()
             bar_color = 'green'
             coin_color = 'green'
         else:
             percentage = percentages_df[percentages_df['timeframe'] == timeframe]['bearish_divergence'].values[0]
-            divergence_coins = df[df[f'{timeframe}_divergence'] == 'Зона медвежьего дивера']['Coin'].tolist()
+            divergence_coins = df[df[f'{timeframe}_divergence'] == 'Зона медвежьего дивера']['Coin'].str.replace('USDT', '').tolist()
             bar_color = 'red'
             coin_color = 'red'
         
@@ -35,8 +35,7 @@ def show_divergence_with_progress(df, divergence_type='bullish'):
         st.write(f"{percentage:.2f}% в зоне {'бычьей' if divergence_type == 'bullish' else 'медвежьей'} дивергенции.")
         
         # Display progress bar with custom color
-        progress_bar = st.progress(0)
-        progress_bar.progress(percentage / 100)
+        st.progress(percentage / 100)
         st.markdown(f"""
             <style>
             .stProgress > div > div > div > div {{

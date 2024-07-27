@@ -35,7 +35,8 @@ def show_divergence_with_progress(df, divergence_type='bullish'):
         st.write(f"{percentage:.2f}% в зоне {'бычьей' if divergence_type == 'bullish' else 'медвежьей'} дивергенции.")
         
         # Display progress bar with custom color
-        st.progress(percentage / 100)
+        progress_bar = st.progress(0)
+        progress_bar.progress(percentage / 100)
         st.markdown(f"""
             <style>
             .stProgress > div > div > div > div {{
@@ -59,7 +60,8 @@ def show_long_zone_coins(coins):
         st.write("Нет монет в зоне бычьей дивергенции по двум или более таймфреймам.")
     else:
         for coin, timeframes in coins:
-            st.write(f"Монета {coin} в зоне бычьей дивергенции по таймфреймам: {', '.join(timeframes)}")
+            coin_name = coin.replace('USDT', '')
+            st.write(f"Монета {coin_name} в зоне бычьей дивергенции по таймфреймам: {', '.join(timeframes)}")
 
 def show_short_zone_coins(coins):
     """
@@ -71,7 +73,8 @@ def show_short_zone_coins(coins):
         st.write("Нет монет в зоне медвежьей дивергенции по двум или более таймфреймам.")
     else:
         for coin, timeframes in coins:
-            st.write(f"Монета {coin} в зоне медвежьей дивергенции по таймфреймам: {', '.join(timeframes)}")
+            coin_name = coin.replace('USDT', '')
+            st.write(f"Монета {coin_name} в зоне медвежьей дивергенции по таймфреймам: {', '.join(timeframes)}")
 
 def show_fast_divergence_table(df, divergence_type='bullish'):
     """

@@ -5,12 +5,6 @@ import csv
 from .telegram_notifications import send_telegram_message
 
 def coins_in_fast_bullish_divergence(df):
-    """
-    Find coins in fast bullish divergence zones.
-
-    :param df: DataFrame with data
-    :return: DataFrame with coins in fast bullish divergence zones
-    """
     fast_bullish_df = df[df.apply(lambda row: any(0 <= row[timeframe] < 15 for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']), axis=1)]
     if not fast_bullish_df.empty:
         for coin in fast_bullish_df['Coin']:
@@ -19,12 +13,6 @@ def coins_in_fast_bullish_divergence(df):
     return fast_bullish_df
 
 def coins_in_fast_bearish_divergence(df):
-    """
-    Find coins in fast bearish divergence zones.
-
-    :param df: DataFrame with data
-    :return: DataFrame with coins in fast bearish divergence zones
-    """
     fast_bearish_df = df[df.apply(lambda row: any(85 < row[timeframe] <= 100 for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']), axis=1)]
     if not fast_bearish_df.empty:
         for coin in fast_bearish_df['Coin']:
@@ -33,9 +21,6 @@ def coins_in_fast_bearish_divergence(df):
     return fast_bearish_df
 
 def fetch_futures_coins():
-    """
-    Function to fetch futures coins from Cvizor.
-    """
     url = 'https://cvizor.com/api/v1/screener/settings'
     response = requests.get(url)
     data = response.json()
@@ -43,18 +28,12 @@ def fetch_futures_coins():
     return futures_coins
 
 def fetch_data_from_api():
-    """
-    Function to fetch data from the API.
-    """
     url = 'https://cvizor.com/api/v2/screener/tables'
     response = requests.get(url)
     data = response.json()
     return data
 
 def parse_data(data, coins):
-    """
-    Function to parse the data and extract RSI14 values for futures coins.
-    """
     intervals = data['intervals']
     rsi14_values = {}
 
@@ -70,9 +49,6 @@ def parse_data(data, coins):
     return rsi14_values, intervals
 
 def save_parsed_data(rsi14_values, intervals):
-    """
-    Function to save parsed RSI14 values to a CSV file.
-    """
     file_path = os.path.join(os.path.dirname(__file__), '../data/rsi14_values.csv')
     with open(file_path, mode='w', newline='') as file:
         writer = csv.writer(file)
@@ -83,23 +59,18 @@ def save_parsed_data(rsi14_values, intervals):
             writer.writerow(row)
 
 def load_data():
-    """
-    Function to load data from a predefined CSV file.
-    """
     file_path = os.path.join(os.path.dirname(__file__), '../data/rsi14_values.csv')
     return pd.read_csv(file_path)
 
 def save_data(df):
-    """
-    Function to save data to a predefined CSV file.
-    """
     file_path = os.path.join(os.path.dirname(__file__), '../data/rsi14_values_with_zones.csv')
     df.to_csv(file_path, index=False)
 
 def classify_rsi_zone(rsi):
-    """
-    Function to classify RSI zone.
-    """
+    try:
+        rsi = float(rsi)
+    except ValueError:
+        return 'Неизвестная зона'
     if 0 <= rsi < 50:
         return 'Красная зона'
     elif 50 <= rsi <= 55:
@@ -109,9 +80,10 @@ def classify_rsi_zone(rsi):
     return 'Неизвестная зона'
 
 def classify_divergence_zone(rsi):
-    """
-    Function to classify divergence zone based on RSI value.
-    """
+    try:
+        rsi = float(rsi)
+    except ValueError:
+        return 'Боковик/Слабый тренд'
     if 0 <= rsi < 30:
         return 'Зона бычьего дивера'
     elif 70 < rsi <= 100:
@@ -123,18 +95,13 @@ def classify_divergence_zone(rsi):
     return 'Боковик/Слабый тренд'
 
 def add_rsi_zones(df):
-    """
-    Add RSI zones and divergence zones to DataFrame.
-    """
     for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']:
+        df[timeframe] = pd.to_numeric(df[timeframe], errors='coerce')
         df[f'{timeframe}_zone'] = df[timeframe].apply(classify_rsi_zone)
         df[f'{timeframe}_divergence'] = df[timeframe].apply(classify_divergence_zone)
     return df
 
 def calculate_divergence_percentages(df):
-    """
-    Calculate the percentage of coins in bullish and bearish divergence zones.
-    """
     total_coins = len(df)
     percentages = {'timeframe': [], 'bullish_divergence': [], 'bearish_divergence': []}
     
@@ -149,9 +116,6 @@ def calculate_divergence_percentages(df):
     return pd.DataFrame(percentages)
 
 def coins_in_long_zone(df):
-    """
-    Determine which coins are in bullish divergence zone for at least two timeframes.
-    """
     result = []
     for index, row in df.iterrows():
         bullish_timeframes = []
@@ -163,34 +127,13 @@ def coins_in_long_zone(df):
     return result
 
 def coins_in_short_zone(df):
-    """
-    Function to identify coins in bearish divergence zone for at least two timeframes
-    
-    Функция для определения монет в зоне медвежьей дивергенции по крайней мере для двух таймфреймов
-    """
     short_coins = []
-
-    for coin, group in df.groupby('Coin'):
-        count = sum(group[f'{timeframe}_divergence'].iloc[0] == 'Зона медвежьего дивера' for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d'])
-        if count >= 2:
-            short_coins.append((coin, [timeframe for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d'] if group[f'{timeframe}_divergence'].iloc[0] == 'Зона медвежьего дивера']))
-
+    for index, row in df.iterrows():
+        bearish_timeframes = []
+        for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']:
+            if row[f'{timeframe}_divergence'] == 'Зона медвежьего дивера':
+                bearish_timeframes.append(timeframe)
+        if len(bearish_timeframes) >= 2:
+            short_coins.append((row['Coin'], bearish_timeframes))
     return short_coins
 
-def coins_in_fast_bullish_divergence(df):
-    """
-    Function to identify coins in fast bullish divergence zone for any timeframe
-    
-    Функция для определения монет в зоне быстрого поиска бычьей дивергенции для любого таймфрейма
-    """
-    fast_bullish_coins = df[df.apply(lambda row: any(row[f'{timeframe}_divergence'] == 'Зона быстрого поиска бычьего дивера' for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']), axis=1)]
-    return fast_bullish_coins
-
-def coins_in_fast_bearish_divergence(df):
-    """
-    Function to identify coins in fast bearish divergence zone for any timeframe
-    
-    Функция для определения монет в зоне быстрого поиска медвежьей дивергенции для любого таймфрейма
-    """
-    fast_bearish_coins = df[df.apply(lambda row: any(row[f'{timeframe}_divergence'] == 'Зона быстрого поиска медвежьего дивера' for timeframe in ['5m', '15m', '30m', '1h', '2h', '4h', '12h', '1d']), axis=1)]
-    return fast_bearish_coins
